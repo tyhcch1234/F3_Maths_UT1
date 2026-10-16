@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>中三數學 UT1 溫習闖關</title>
+<style>
+:root{
+  --c1:#7b2ff7; --c2:#2f80ed; --c3:#00c6ff; --c4:#ff6ec4;
+  --ok:#19c37d; --bad:#ff4d6d; --ink:#2b2350; --muted:#7a7390;
+  --card:#ffffff; --radius:20px;
+}
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+html,body{margin:0;padding:0;}
+body{
+  font-family:"PingFang HK","Microsoft JhengHei","Noto Sans TC","Segoe UI",sans-serif;
+  color:var(--ink); min-height:100vh; overflow-x:hidden;
+  background:linear-gradient(135deg,#7b2ff7 0%,#2f80ed 45%,#00c6ff 100%);
+}
+#bg{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;}
+.blob{position:absolute;border-radius:50%;filter:blur(6px);opacity:.5;animation:float 18s ease-in-out infinite;}
+.blob.b1{width:340px;height:340px;background:#ff6ec4;top:-80px;left:-80px;}
+.blob.b2{width:260px;height:260px;background:#00c6ff;bottom:-60px;right:-40px;animation-delay:-6s;}
+.blob.b3{width:180px;height:180px;background:#ffe45e;top:40%;right:12%;animation-delay:-12s;opacity:.35;}
+@keyframes float{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(30px,-30px) scale(1.12)}}
+main{position:relative;z-index:2;max-width:820px;margin:0 auto;padding:22px 16px 60px;}
+.screen{display:block;animation:fadeUp .4s ease;}
+.screen.hidden{display:none;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+
+header{text-align:center;color:#fff;margin-bottom:18px;}
+header h1{margin:0;font-size:clamp(24px,4.5vw,40px);letter-spacing:1px;text-shadow:0 3px 12px rgba(0,0,0,.25);}
+header p{margin:6px 0 0;opacity:.92;font-size:14px;}
+
+.card{background:var(--card);border-radius:var(--radius);padding:22px;box-shadow:0 16px 40px rgba(20,10,60,.28);}
+.hidden{display:none!important;}
+
+/* start */
+.hero{text-align:center;padding:12px 4px 6px;}
+.hero .ball{width:88px;height:88px;margin:0 auto 10px;animation:bounce 2s ease-in-out infinite;}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+.chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:16px 0 4px;}
+.chip{background:linear-gradient(135deg,#efeaff,#e7f4ff);color:#5b4aa8;padding:7px 13px;border-radius:999px;font-size:13px;font-weight:600;}
+.rules{text-align:left;margin:16px auto 6px;max-width:560px;color:#4a4468;font-size:14.5px;line-height:1.9;}
+.rules b{color:#7b2ff7;}
+.bigbtn{display:block;width:100%;max-width:340px;margin:18px auto 4px;padding:16px;border:none;border-radius:16px;
+  background:linear-gradient(135deg,#7b2ff7,#ff6ec4);color:#fff;font-size:19px;font-weight:800;letter-spacing:2px;
+  cursor:pointer;box-shadow:0 10px 24px rgba(123,47,247,.4);transition:transform .12s;}
+.bigbtn:hover{transform:translateY(-2px) scale(1.02);}
+.bigbtn:active{transform:scale(.98);}
+
+/* quiz */
+.quiztop{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px;}
+.pill{background:linear-gradient(135deg,#efeaff,#e7f4ff);color:#5b4aa8;padding:6px 12px;border-radius:999px;font-size:12.5px;font-weight:700;}
+.count{color:#5b4aa8;font-weight:800;font-size:14px;margin-left:auto;}
+.score{background:#fff;border:2px solid #e9e4ff;color:#7b2ff7;font-weight:800;padding:5px 12px;border-radius:999px;font-size:13.5px;}
+.progwrap{height:12px;background:#efeaff;border-radius:999px;overflow:hidden;margin-bottom:18px;}
+#progbar{height:100%;width:0;background:linear-gradient(90deg,#7b2ff7,#ff6ec4);border-radius:999px;transition:width .35s ease;}
+.qtext{font-size:clamp(16.5px,3.4vw,20px);font-weight:700;line-height:1.7;margin:6px 0 18px;color:#2b2350;}
+.qtext .m{font-size:12px;color:var(--muted);font-weight:600;margin-left:6px;}
+.opts{display:flex;flex-direction:column;gap:11px;}
+.opt{position:relative;display:flex;align-items:center;gap:12px;padding:14px 15px;border-radius:14px;
+  border:2px solid #ece7ff;background:#faf8ff;cursor:pointer;font-size:16px;font-weight:600;transition:.15s;text-align:left;color:#3a3460;}
+.opt:hover{border-color:#b7a6ff;background:#f3efff;transform:translateX(3px);}
+.opt .key{flex:0 0 auto;width:30px;height:30px;border-radius:9px;background:#ece7ff;color:#7b2ff7;display:grid;place-items:center;font-weight:800;font-size:14px;}
+.opt.sel{border-color:#7b2ff7;background:#efeaff;}
+.opt.correct{border-color:var(--ok);background:#e8fbf1;}
+.opt.correct .key{background:var(--ok);color:#fff;}
+.opt.wrong{border-color:var(--bad);background:#fff0f3;animation:shake .3s;}
+.opt.wrong .key{background:var(--bad);color:#fff;}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.opt.disabled{pointer-events:none;opacity:.85;}
+.multi-hint{font-size:12.5px;color:var(--muted);font-weight:600;margin-bottom:8px;}
+.numwrap{display:flex;gap:10px;flex-wrap:wrap;}
+#numIn{flex:1;min-width:180px;padding:14px 16px;border-radius:14px;border:2px solid #ece7ff;background:#faf8ff;font-size:17px;font-weight:700;color:#2b2350;outline:none;}
+#numIn:focus{border-color:#7b2ff7;background:#fff;}
+.submitbtn{padding:14px 22px;border:none;border-radius:14px;background:linear-gradient(135deg,#7b2ff7,#2f80ed);color:#fff;font-size:16px;font-weight:800;cursor:pointer;}
+.fb{margin-top:18px;padding:16px 18px;border-radius:14px;line-height:1.75;font-size:15px;}
+.fb.good{background:#e8fbf1;border:2px solid #b9f0d4;color:#0e7a4a;}
+.fb.bad{background:#fff0f3;border:2px solid #ffccd5;color:#b0203a;}
+.fb .ttl{font-weight:800;font-size:16px;margin-bottom:4px;}
+.fb .exp{color:#4a4468;font-size:14px;line-height:1.85;}
+.fml{display:inline-block;background:#f3efff;border:1px solid #e2d9ff;color:#5b2fd0;border-radius:8px;padding:1px 10px;font-weight:700;margin:1px 0 6px;}
+.nextbtn{display:block;width:100%;margin-top:16px;padding:15px;border:none;border-radius:14px;
+  background:linear-gradient(135deg,#2f80ed,#00c6ff);color:#fff;font-size:17px;font-weight:800;letter-spacing:1px;cursor:pointer;}
+
+/* result */
+.reswrap{text-align:center;}
+.bigpct{font-size:clamp(52px,12vw,84px);font-weight:900;background:linear-gradient(135deg,#7b2ff7,#ff6ec4);-webkit-background-clip:text;background-clip:text;color:transparent;line-height:1;}
+.resline{font-size:15px;color:var(--muted);margin-top:8px;}
+.verdict{margin:18px auto;padding:16px;border-radius:14px;font-size:17px;font-weight:800;}
+.verdict.pass{background:#e8fbf1;color:#0e7a4a;border:2px solid #b9f0d4;}
+.verdict.fail{background:#fff0f3;color:#b0203a;border:2px solid #ffccd5;}
+.stars{font-size:28px;letter-spacing:4px;margin:6px 0;}
+
+/* gacha */
+.drawArea{margin-top:10px;}
+.pokestage{perspective:1200px;width:280px;height:392px;margin:6px auto 18px;}
+.pokecard{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .8s cubic-bezier(.2,.8,.3,1);}
+.pokecard.flip{transform:rotateY(180deg);}
+.face{position:absolute;inset:0;border-radius:20px;backface-visibility:hidden;overflow:hidden;box-shadow:0 18px 40px rgba(20,10,60,.35);}
+.cardback{background:linear-gradient(135deg,#2b2350,#7b2ff7);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;gap:10px;}
+.cardback .ball{width:120px;height:120px;animation:bounce 1.6s ease-in-out infinite;}
+.cardback p{margin:0;font-weight:800;letter-spacing:2px;opacity:.9;}
+.cardface{transform:rotateY(180deg);padding:16px;color:#fff;display:flex;flex-direction:column;}
+.pname{font-size:24px;font-weight:900;letter-spacing:1px;}
+.pen{font-size:12px;opacity:.9;font-weight:600;}
+.php{margin-left:auto;background:rgba(255,255,255,.25);border-radius:999px;padding:5px 12px;font-size:13px;font-weight:800;}
+.ptoprow{display:flex;align-items:flex-start;gap:8px;}
+.ptypes{margin-top:8px;display:flex;gap:6px;}
+.ptype{padding:4px 11px;border-radius:999px;background:rgba(255,255,255,.28);font-size:12.5px;font-weight:700;}
+.pportrait{flex:1;margin:12px 4px;border-radius:16px;background:rgba(255,255,255,.18);display:grid;place-items:center;position:relative;overflow:hidden;}
+.pportrait .big{font-size:88px;filter:drop-shadow(0 6px 8px rgba(0,0,0,.25));}
+.pportrait .ballw{position:absolute;width:120px;opacity:.18;right:-20px;bottom:-20px;}
+.pstats{display:flex;gap:8px;margin-top:6px;}
+.pstat{flex:1;background:rgba(255,255,255,.22);border-radius:12px;padding:8px 10px;font-size:12px;font-weight:800;text-align:center;}
+.pstat span{display:block;font-size:17px;}
+.prarity{margin-top:10px;text-align:center;font-size:13px;font-weight:800;letter-spacing:1px;}
+.shine{position:absolute;top:-60%;left:-60%;width:50%;height:220%;background:linear-gradient(100deg,rgba(255,255,255,0) 0%,rgba(255,255,255,.55) 50%,rgba(255,255,255,0) 100%);transform:rotate(20deg);animation:shine 2.6s ease-in-out infinite;}
+@keyframes shine{0%{left:-60%}60%,100%{left:130%}}
+.drawbtn{margin:6px auto 2px;}
+
+/* collection */
+.collwrap{margin-top:22px;text-align:left;}
+.collwrap h3{margin:0 0 12px;color:#5b4aa8;}
+.colgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:10px;}
+.mini{border-radius:12px;padding:9px 6px;text-align:center;color:#fff;box-shadow:0 6px 14px rgba(20,10,60,.2);position:relative;}
+.mini .mn{font-size:12.5px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.mini .mr{font-size:9.5px;opacity:.92;}
+.mini .mc{font-size:10px;background:rgba(0,0,0,.28);border-radius:999px;padding:2px 7px;display:inline-block;margin-top:5px;}
+.mini.locked{filter:grayscale(1);opacity:.55;}
+.mini .lock{font-size:20px;}
+.footer{text-align:center;color:#fff;margin-top:26px;font-size:12px;opacity:.85;}
+
+/* confetti */
+.conf{position:fixed;top:-20px;width:10px;height:14px;z-index:50;animation:fall linear forwards;}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg);opacity:.2;}}
+
+@media(max-width:520px){
+  .card{padding:16px;}
+  .pokestage{width:240px;height:336px;}
+}
+</style>
+</head>
+<body>
+<div id="bg"><span class="blob b1"></span><span class="blob b2"></span><span class="blob b3"></span></div>
+<main>
+  <header>
+    <h1>⚡ 中三數學 UT1 溫習闖關</h1>
+    <p>百分法 · 單利息 · 複利息 · 概率｜答題奪分，抽 Pokémon 卡！</p>
+  </header>
+
+  <!-- START -->
+  <section id="screen-start" class="screen">
+    <div class="card">
+      <div class="hero">
+        <div class="ball"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="#ee1515" stroke="#1f1f1f" stroke-width="6"/><path d="M4 50 A46 46 0 0 0 96 50 Z" fill="#fff"/><rect x="4" y="45" width="92" height="10" fill="#1f1f1f"/><circle cx="50" cy="50" r="14" fill="#fff" stroke="#1f1f1f" stroke-width="6"/><circle cx="50" cy="50" r="7" fill="#1f1f1f"/></svg></div>
+        <div class="chips">
+          <span class="chip">📐 百分法公式</span><span class="chip">💹 增長／折舊</span>
+          <span class="chip">🏦 單利／複利</span><span class="chip">🎲 概率</span><span class="chip">📝 歷屆試題</span>
+        </div>
+        <div class="rules">
+          <p>🎯 本測驗共有 <b id="totalQ"></b> 題，涵蓋公式、例題及歷屆試題，全部取自你的溫習筆記。</p>
+          <p>⭐ 每題顯示<b>分數</b>，答對即時得分；答錯會顯示<b>題解</b>，溫故知新。</p>
+          <p>🏆 總分達到 <b>50%</b> 即算合格，可獲得 <b>1 次抽 Pokémon 卡</b>機會！</p>
+          <p>📖 卡片會儲存在本機，重複挑戰可收集不同精靈。</p>
+        </div>
+        <button class="bigbtn" onclick="startQuiz()">開始闖關 ▶</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- QUIZ -->
+  <section id="screen-quiz" class="screen hidden">
+    <div class="card">
+      <div class="quiztop">
+        <span class="pill" id="topic"></span>
+        <span class="count" id="qcount"></span>
+        <span class="score" id="score">得分 0</span>
+      </div>
+      <div class="progwrap"><div id="progbar"></div></div>
+      <div class="qtext" id="qtext"></div>
+      <div id="answerArea"></div>
+      <div id="fb" class="fb hidden"></div>
+      <button id="nextBtn" class="nextbtn hidden" onclick="next()">下一題 →</button>
+    </div>
+  </section>
+
+  <!-- RESULT -->
+  <section id="screen-result" class="screen hidden">
+    <div class="card reswrap">
+      <h2 style="margin:4px 0 0">測驗結果</h2>
+      <div class="bigpct" id="pct"></div>
+      <div class="resline" id="resline"></div>
+      <div class="stars" id="stars"></div>
+      <div class="verdict" id="verdict"></div>
+      <div class="drawArea" id="drawArea"></div>
+      <div class="collwrap" id="collwrap"></div>
+      <button class="bigbtn" onclick="startQuiz()" style="margin-top:18px">🔄 再玩一次</button>
+    </div>
+  </section>
+
+  <div class="footer">內容來源：3D重溫筆記(UT1) 及 TYH Past Paper (UT1綜合)(ans)</div>
+</main>
+
+<script>
+/* ==================== 題目庫（全部取自兩份文件） ==================== */
+const Q = [
+// —— 百分法・公式 ——
+{t:"百分法｜公式",ty:"mc",q:"「某部分佔全部的百分數」的計算方法是？",o:["部分數值 ÷ 全部數值 × 100%","全部數值 ÷ 部分數值 × 100%","(全部數值 − 部分數值) × 100%","部分數值 × 全部數值"],a:0,m:1,e:"<span class='fml'>公式：部分佔全部的百分數 = (部分數值 ÷ 全部數值) × 100%</span>"},
+{t:"百分法｜公式",ty:"mc",q:"「百分變化」的計算方法是？",o:["新值 ÷ 原值 × 100%","(原值 − 新值) ÷ 新值 × 100%","(新值 − 原值) ÷ 原值 × 100%","原值 ÷ 新值 × 100%"],a:2,m:1,e:"<span class='fml'>公式：百分變化 = (新值 − 原值) ÷ 原值 × 100%</span>"},
+{t:"百分法｜公式",ty:"mc",q:"一個數值「增加」後，新值的計算方法是？",o:["新值 = 原值 × (1 + 百分增加)","新值 = 原值 × (1 − 百分增加)","新值 = 原值 ÷ (1 + 百分增加)","新值 = 原值 × 百分增加"],a:0,m:1,e:"<span class='fml'>公式：新值 = 原值 × (1 + 百分增加)</span>"},
+{t:"百分法｜公式",ty:"mc",q:"一個數值「減少」後，新值的計算方法是？",o:["新值 = 原值 × (1 + 百分減少)","新值 = 原值 × (1 − 百分減少)","新值 = 原值 ÷ (1 − 百分減少)","新值 = 原值 × 百分減少"],a:1,m:1,e:"<span class='fml'>公式：新值 = 原值 × (1 − 百分減少)</span>"},
+{t:"百分法｜公式",ty:"mc",q:"若一個量 P 每期以固定率 R% 增加（增長），n 期後的新值 P′ = ?",o:["P(1 − R%)ⁿ","P + R%·n","P(1 + R%)ⁿ","P(1 + nR%)"],a:2,m:1,e:"<span class='fml'>公式：增長 P′ = P(1 + R%)ⁿ</span>"},
+{t:"百分法｜公式",ty:"mc",q:"在增長公式 P′ = P(1 + R%)ⁿ 中，(1 + R%) 稱為？",o:["衰變因子","增長因子","增長率","本金"],a:1,m:1,e:"<span class='fml'>公式：P′ = P(1 + R%)ⁿ，其中 (1 + R%) 稱為「增長因子」</span>"},
+{t:"百分法｜公式",ty:"mc",q:"若一個量 P 每期以固定率 R% 減少（折舊），n 期後的新值 P′ = ?",o:["P(1 + R%)ⁿ","P(1 − R%)ⁿ","P − R%·n","P(1 + nR%)"],a:1,m:1,e:"<span class='fml'>公式：折舊 P′ = P(1 − R%)ⁿ</span>"},
+{t:"百分法｜公式",ty:"mc",q:"在折舊公式 P′ = P(1 − R%)ⁿ 中，(1 − R%) 稱為？",o:["增長因子","衰變因子","折舊率","現值"],a:1,m:1,e:"<span class='fml'>公式：P′ = P(1 − R%)ⁿ，其中 (1 − R%) 稱為「衰變因子」</span>"},
+{t:"百分法｜公式",ty:"mc",q:"單利息 $I 的計算公式是？（本金 $P、利率 R%、期數 T）",o:["I = P × R% × T","I = P × (1 + R%)","I = A − P（此為複利息）","I = P(1 + R%)ᵀ"],a:0,m:1,e:"<span class='fml'>公式：單利息 I = P × R% × T（或 I = PRT ÷ 100）</span>"},
+{t:"百分法｜公式",ty:"mc",q:"本利和 $A 與本金 $P、利息 $I 的關係是？",o:["A = P − I","A = P + I","A = I − P","A = P × I"],a:1,m:1,e:"<span class='fml'>公式：本利和 A = P + I</span>"},
+{t:"百分法｜公式",ty:"mc",q:"以「單利息」計算，本利和 A = ?",o:["A = P(1 + R% × T)","A = P(1 + R%)ᵀ","A = P(1 − R%)ᵀ","A = P × R% × T"],a:0,m:1,e:"<span class='fml'>公式：A = P + P × R% × T = P(1 + R% × T)</span>"},
+{t:"百分法｜公式",ty:"mc",q:"以「複利息」計算，n 期後的本利和 A = ?",o:["A = P(1 + R% × T)","A = P(1 + R%)ⁿ","A = P(1 − R%)ⁿ","A = P + R%·n"],a:1,m:1,e:"<span class='fml'>公式：複利本利和 A = P(1 + R%)ⁿ</span>"},
+{t:"百分法｜公式",ty:"mc",q:"複利息 $I 可由以下哪個公式求得？",o:["I = P × R% × T","I = A + P","I = A − P","I = P(1 + R%)"],a:2,m:1,e:"<span class='fml'>公式：複利息 I = A − P</span>"},
+{t:"概率｜公式",ty:"mc",q:"事件 E 的概率 P(E) 的一般計算方法是？",o:["所有可能結果的數目 ÷ 有利結果的數目","有利結果的數目 ÷ 所有可能結果的數目","有利結果的數目 × 所有可能結果的數目","所有可能結果的數目 − 有利結果的數目"],a:1,m:1,e:"<span class='fml'>公式：P(E) = 有利結果的數目 ÷ 所有可能結果的數目</span>"},
+{t:"概率｜方法",ty:"multi",q:"求概率時，我們可用哪些方法列出「所有可能結果」？（選所有正確答案）",o:["利用表（列表）","利用樹形圖","利用直線圖","利用圓形圖"],a:[0,1],m:2,e:"<span class='fml'>方法：① 利用表（列表）　② 利用樹形圖</span>"},
+
+// —— 百分法・例題（筆記） ——
+{t:"百分法｜例題 2.1T",ty:"num",q:"某森林原來的面積為 800 km²，它的面積先減少 8%，再增加 8%。求該森林新的面積。<span class='m'>(輸入數值，km²)</span>",num:794.88,tol:0.01,m:2,e:"<span class='fml'>公式：新值 = 原值 × (1 − 百分減少) × (1 + 百分增加)</span><br>新的面積 = 800 × (1 − 8%) × (1 + 8%)<br>= 800 × 0.92 × 1.08<br>= 794.88 km²"},
+{t:"百分法｜例題 2.2T",ty:"num",q:"某股票的價格先增加 20%，然後減少 25%。若最新價格為 $81，求原來的價格。<span class='m'>(輸入數值，$)</span>",num:90,tol:0.001,m:3,e:"<span class='fml'>公式：新值 = 原值 × (1 + 百分增加) × (1 − 百分減少)</span><br>設原來的價格為 $x。<br>x × (1 + 20%) × (1 − 25%) = 81<br>x × 1.2 × 0.75 = 81<br>0.9x = 81<br>x = 81 ÷ 0.9<br>x = 90<br>∴ 原來的價格為 $90。"},
+{t:"百分法｜例題 2.3T",ty:"num",q:"某汽水在六月的銷量為 20 000；七月減少 20%，八月增加 30%。求六月至八月銷量的「百分變化」。<span class='m'>(輸入數值，如 +4 或 −4)</span>",num:4,tol:0.001,m:3,e:"<span class='fml'>公式：百分變化 = (新值 − 原值) ÷ 原值 × 100%</span><br>八月的銷量 = 20 000 × (1 − 20%) × (1 + 30%)<br>= 20 000 × 0.8 × 1.3 = 20 800<br>百分變化 = (20 800 − 20 000) ÷ 20 000 × 100%<br>= 800 ÷ 20 000 × 100%<br>= +4%"},
+{t:"百分法｜例題 2.4T",ty:"num",q:"長方形的長及闊分別為 12 cm 及 10 cm。若長增加 50%、闊減少 20%，求新的面積。<span class='m'>(輸入數值，cm²)</span>",num:144,tol:0.001,m:2,e:"<span class='fml'>公式：新值 = 原值 × (1 ± 百分變化)；面積 = 長 × 闊</span><br>新的長 = 12 × (1 + 50%) = 12 × 1.5 = 18 cm<br>新的闊 = 10 × (1 − 20%) = 10 × 0.8 = 8 cm<br>∴ 新的面積 = 18 × 8 = 144 cm²"},
+{t:"百分法｜例題 2.4T",ty:"num",q:"承上題：長 12→增加50%、闊 10→減少20%。求面積的「百分變化」。<span class='m'>(輸入數值，如 +20)</span>",num:20,tol:0.001,m:2,e:"<span class='fml'>公式：百分變化 = (新值 − 原值) ÷ 原值 × 100%</span><br>原來的面積 = 12 × 10 = 120 cm²<br>新的面積 = 144 cm²<br>百分變化 = (144 − 120) ÷ 120 × 100%<br>= 24 ÷ 120 × 100%<br>= +20%"},
+{t:"百分法｜例題 2.7T",ty:"num",q:"某對限量版鞋子三年前的價值為 $3000，價值每年增加 20%。求它的現值。<span class='m'>(輸入數值，$)</span>",num:5184,tol:0.5,m:2,e:"<span class='fml'>公式：增長 P′ = P(1 + R%)ⁿ</span><br>現值 = 3000 × (1 + 20%)³<br>= 3000 × (1.2)³<br>= 3000 × 1.728<br>= $5184"},
+{t:"百分法｜例題 2.8T",ty:"num",q:"一棵植物的高度每星期增加 25%，現時高度為 20 cm。求它「兩星期前」的高度。<span class='m'>(輸入數值，cm)</span>",num:12.8,tol:0.01,m:3,e:"<span class='fml'>公式：增長 P′ = P(1 + R%)ⁿ</span><br>設兩星期前的高度為 h cm。<br>20 = h × (1 + 25%)²<br>20 = h × 1.25²<br>20 = 1.5625h<br>h = 20 ÷ 1.5625 = 12.8<br>∴ 兩星期前的高度為 12.8 cm。"},
+{t:"百分法｜例題 2.9T",ty:"num",q:"嘉麗在 2017 年初以 $6000 購買了一個手提袋，價值每年減少 10%。求手提袋在 2020 年年初的價值。<span class='m'>(輸入數值，$)</span>",num:4374,tol:0.5,m:2,e:"<span class='fml'>公式：折舊 P′ = P(1 − R%)ⁿ</span><br>價值 = 6000 × (1 − 10%)³<br>= 6000 × (0.9)³<br>= 6000 × 0.729<br>= $4374"},
+{t:"百分法｜例題 2.10T",ty:"num",q:"湖泊內現有魚 50 000 條；首兩年每年減少 10%，其後每年減少 20%。求 4 年後魚的數目。",num:25920,tol:0.5,m:3,e:"<span class='fml'>公式：折舊 P′ = P(1 − R%)ⁿ（分兩段計算）</span><br>2 年後 = 50 000 × (1 − 10%)² = 50 000 × 0.81 = 40 500<br>4 年後 = 40 500 × (1 − 20%)² = 40 500 × 0.64 = 25 920"},
+{t:"百分法｜單利息 簡例1",ty:"num",q:"把 $4000 存入銀行，年利率為 3%，為期 2 年。求「單利息」。<span class='m'>(輸入數值，$)</span>",num:240,tol:0.001,m:2,e:"<span class='fml'>公式：單利息 I = P × R% × T</span><br>單利息 = 4000 × 3% × 2<br>= 4000 × 0.03 × 2<br>= $240"},
+{t:"百分法｜單利息 例題2.12T",ty:"num",q:"素妍把 $1000 存入銀行，年利率為 5%，以單利息計算。求 2 年後的本利和。<span class='m'>(輸入數值，$)</span>",num:1100,tol:0.001,m:2,e:"<span class='fml'>公式：I = P × R% × T；A = P + I</span><br>單利息 = 1000 × 5% × 2 = 1000 × 0.05 × 2 = $100<br>本利和 = 1000 + 100 = $1100"},
+{t:"百分法｜複利息 例題2.16T",ty:"num",q:"陳先生把 $10 000 存入銀行，年利率為 5%，複利計算、每年一結。求 2 年後的本利和。<span class='m'>(輸入數值，$)</span>",num:11025,tol:0.5,m:2,e:"<span class='fml'>公式：複利本利和 A = P(1 + R%)ⁿ</span><br>本利和 = 10 000 × (1 + 5%)²<br>= 10 000 × 1.05²<br>= 10 000 × 1.1025<br>= $11 025"},
+{t:"百分法｜複利息 例題2.16T",ty:"num",q:"承上題（本金 $10 000、年利率 5%、每年一結）。求 2 年後的「複利息」。<span class='m'>(輸入數值，$)</span>",num:1025,tol:0.5,m:2,e:"<span class='fml'>公式：複利息 I = A − P</span><br>本利和 A = 10 000 × (1 + 5%)² = $11 025<br>複利息 = 11 025 − 10 000 = $1025"},
+{t:"百分法｜複利息 例題2.17T",ty:"num",q:"把 $20 000 存入銀行，年利率為 12%，為期 2 年，複利「每半年一結」。求本利和（準確至最接近的元）。<span class='m'>(輸入數值，$)</span>",num:25250,tol:0.5,m:3,e:"<span class='fml'>公式：A = P(1 + R%)ⁿ；每期利率 = 年利率 ÷ 每年結算次數</span><br>每半年利率 = 12% ÷ 2 = 6%；期數 = 2 × 2 = 4<br>本利和 = 20 000 × (1 + 6%)⁴<br>= 20 000 × 1.06⁴<br>= 20 000 × 1.262477<br>≈ $25 250（準確至最接近的元）"},
+{t:"百分法｜複利息 例題2.17T",ty:"num",q:"承上題（本金 $20 000、年利率 12%、2 年）。若「每季一結」，求本利和（準確至最接近的元）。<span class='m'>(輸入數值，$)</span>",num:25335,tol:0.5,m:3,e:"<span class='fml'>公式：A = P(1 + R%)ⁿ；每期利率 = 年利率 ÷ 每年結算次數</span><br>每季利率 = 12% ÷ 4 = 3%；期數 = 2 × 4 = 8<br>本利和 = 20 000 × (1 + 3%)⁸<br>= 20 000 × 1.03⁸<br>= 20 000 × 1.26677<br>≈ $25 335（準確至最接近的元）"},
+
+// —— 概率・例題（筆記） ——
+{t:"概率｜簡例1",ty:"num",q:"某班有 12 名男生及 16 名女生。隨機選出一名學生，求選出「男生」的概率。<span class='m'>(以分數作答，如 3/7)</span>",num:3/7,tol:0.006,m:2,e:"<span class='fml'>公式：P(E) = 有利結果的數目 ÷ 所有可能結果的數目</span><br>學生總數 = 12 + 16 = 28<br>P(男生) = 12 ÷ 28 = 3/7"},
+{t:"概率｜例題5.1T",ty:"num",q:"考慮「INTEGERS」這個字。求字裏「E」的數目。",num:2,tol:0.001,m:1,e:"<span class='fml'>方法：逐一數出字母出現的次數</span><br>「INTEGERS」= I、N、T、E、G、E、R、S<br>「E」出現 2 次<br>∴ E 的數目 = 2"},
+{t:"概率｜例題5.1T",ty:"num",q:"從「INTEGERS」這個字裏隨機選出一個字母，求選出「元音字母」的概率。<span class='m'>(以分數作答)</span>",num:3/8,tol:0.006,m:2,e:"<span class='fml'>公式：P(E) = 有利結果的數目 ÷ 所有可能結果的數目</span><br>「INTEGERS」共 8 個字母<br>元音字母 = I、E、E，共 3 個<br>P(元音字母) = 3 ÷ 8 = 3/8"},
+{t:"概率｜例題5.2T",ty:"num",q:"某袋子內有 3 個白球及 n 個黑球。若抽出白球的概率為 1/5，求黑球的數目 n。",num:12,tol:0.001,m:3,e:"<span class='fml'>公式：P(E) = 有利結果的數目 ÷ 所有可能結果的數目</span><br>球的總數 = 3 + n<br>P(白球) = 3 ÷ (3 + n) = 1/5<br>3 ÷ (3 + n) = 1/5<br>15 = n + 3<br>n = 12<br>∴ 黑球的數目為 12。"},
+{t:"概率｜例題5.4T",ty:"num",q:"考慮一副 52 張的撲克牌。隨機抽出一張牌，求抽出「紅心或黑色牌」的概率。<span class='m'>(以分數作答)</span>",num:3/4,tol:0.006,m:2,e:"<span class='fml'>公式：P(E) = 有利結果的數目 ÷ 所有可能結果的數目</span><br>紅心牌 = 13 張；黑色牌 = 黑桃 13 + 梅花 13 = 26 張<br>有利結果 = 13 + 26 = 39<br>P = 39 ÷ 52 = 3/4"},
+{t:"概率｜簡例2",ty:"num",q:"投擲一個瓶蓋多次：頂向上 135 次、頂向下 41 次、頂向側 24 次。估算擲出「頂向側」的概率。<span class='m'>(以分數作答)</span>",num:3/25,tol:0.006,m:2,e:"<span class='fml'>公式：估算概率 = 該結果的頻數 ÷ 總頻數</span><br>總次數 = 135 + 41 + 24 = 200<br>P(頂向側) = 24 ÷ 200 = 3/25"},
+{t:"概率｜例題5.5T",ty:"num",q:"隨機訪問 100 名小學畢業生：第一志願 50 人、第二志願 25 人。估算獲派「首兩志願」的概率。<span class='m'>(以分數作答)</span>",num:3/4,tol:0.006,m:2,e:"<span class='fml'>公式：P(E) = 有利結果的數目 ÷ 所有可能結果的數目</span><br>首兩志願的人數 = 50 + 25 = 75<br>P = 75 ÷ 100 = 3/4"},
+{t:"概率｜例題5.7T",ty:"num",q:"從「ANNA」及「ELSA」這兩個字裏，各隨機選出一個字母。求選出「兩個 A」的概率。<span class='m'>(以分數作答)</span>",num:1/8,tol:0.006,m:2,e:"<span class='fml'>公式：P(E) = 有利結果的數目 ÷ 所有可能結果的數目</span><br>可能結果總數 = 4 × 4 = 16<br>兩個「A」：ANNA 有 2 個 A × ELSA 有 1 個 A = 2 個<br>P = 2 ÷ 16 = 1/8"},
+{t:"概率｜例題5.9T",ty:"num",q:"盒子 A 有數字 1–4、盒子 B 有數字 1–3。各抽一數，求「兩數之和為 4」的概率。<span class='m'>(以分數作答)</span>",num:1/4,tol:0.006,m:3,e:"<span class='fml'>公式：P(E) = 有利結果的數目 ÷ 所有可能結果的數目</span><br>可能結果總數 = 4 × 3 = 12<br>兩數之和為 4：(1,3)、(2,2)、(3,1)，共 3 個<br>P = 3 ÷ 12 = 1/4"},
+{t:"概率｜例題5.10T",ty:"num",q:"盒子 X 有字母 C、A、T；盒子 Y 有字母 E、A、T。各抽一卡，求抽出「至少一個 A」的概率。<span class='m'>(以分數作答)</span>",num:5/9,tol:0.006,m:3,e:"<span class='fml'>公式：P(至少一個 A) = 1 − P(沒有 A)</span><br>可能結果總數 = 3 × 3 = 9<br>沒有 A：盒子 X 選 C/T（2 種）× 盒子 Y 選 E/T（2 種）= 4 個<br>P(至少一個 A) = 1 − 4/9 = 5/9"},
+
+// —— 歷屆試題 MC ——
+{t:"歷屆｜F3百分數 24-25",ty:"mc",q:"某公司 37.5% 僱員為女性；60% 男僱員及 80% 女僱員已婚。該公司中已婚僱員所佔百分數為？",o:["32.5%","45%","55%","67.5%"],a:3,m:2,e:"<span class='fml'>公式：已婚佔比 = 男佔比 × 男已婚率 + 女佔比 × 女已婚率</span><br>女性 = 37.5%；男性 = 1 − 37.5% = 62.5%<br>已婚 = 62.5% × 60% + 37.5% × 80%<br>= 37.5% + 30%<br>= 67.5%"},
+{t:"歷屆｜F3百分數 22-23",ty:"mc",q:"某雜誌的價錢較報紙高 60%，則報紙的價錢較雜誌低？",o:["37.5%","40%","60%","62.5%"],a:0,m:2,e:"<span class='fml'>公式：百分減少 = (差 ÷ 較大的原值) × 100%</span><br>設報紙價錢 = p，則雜誌價錢 = p × (1 + 60%) = 1.6p<br>報紙較雜誌低 = (1.6p − p) ÷ 1.6p × 100%<br>= 0.6 ÷ 1.6 × 100%<br>= 37.5%"},
+{t:"歷屆｜F3連續變化 24-25",ty:"mc",q:"某數先增加 35%，隨後減少 20%，最後增加 10% 至 594。求該數。",o:["500","520","569","619"],a:0,m:2,e:"<span class='fml'>公式：新值 = 原值 × (1 ± 百分變化) 連乘</span><br>設該數為 x。<br>x × (1 + 35%) × (1 − 20%) × (1 + 10%) = 594<br>x × 1.35 × 0.8 × 1.1 = 594<br>x × 1.188 = 594<br>x = 594 ÷ 1.188<br>x = 500"},
+{t:"歷屆｜F3增長 24-25",ty:"mc",q:"某培養皿中細菌每小時增加 23%。求細菌數目在 7 小時的百分增加（準確至最接近 1%）。",o:["161%","326%","426%","523%"],a:1,m:2,e:"<span class='fml'>公式：P′ = P(1 + R%)ⁿ；百分增加 = [(1 + R%)ⁿ − 1] × 100%</span><br>7 小時後的倍數 = (1 + 23%)⁷ = 1.23⁷ ≈ 4.2594<br>百分增加 = (4.2594 − 1) × 100%<br>= 325.94%<br>≈ 326%（準確至最接近的 1%）"},
+{t:"歷屆｜F3複利息 24-25",ty:"mc",q:"把 $5000 存入銀行，年利率 9%，為期 10 個月，複利計算、每月一結。求複利息（準確至最接近的元）。",o:["$375","$388","$450","$469"],a:1,m:2,e:"<span class='fml'>公式：複利息 I = P(1 + R%)ⁿ − P</span><br>每月利率 = 9% ÷ 12 = 0.75%；期數 = 10<br>複利息 = 5000 × (1 + 0.75%)¹⁰ − 5000<br>= 5000 × 1.077583 − 5000<br>≈ 5387.9 − 5000<br>= $388（準確至最接近的元）"},
+{t:"歷屆｜F3概率 24-25",ty:"mc",q:"投擲兩枚勻稱骰子一次。求所擲得的兩數「之差為 1」的概率。",o:["1/3","1/5","1/6","5/18"],a:3,m:2,e:"<span class='fml'>公式：P(E) = 有利結果的數目 ÷ 所有可能結果的數目</span><br>兩骰子共有 6 × 6 = 36 個結果<br>差為 1：(1,2)(2,1)(2,3)(3,2)(3,4)(4,3)(4,5)(5,4)(5,6)(6,5)，共 10 個<br>P = 10 ÷ 36 = 5/18"},
+{t:"歷屆｜F3概率 23-24",ty:"mc",q:"從「RESTAURANT」這個字裏隨機選出一個字母。選出元音字母的概率為？",o:["1/5","3/10","2/5","1/2"],a:2,m:2,e:"<span class='fml'>公式：P(E) = 有利結果的數目 ÷ 所有可能結果的數目</span><br>「RESTAURANT」共 10 個字母<br>元音字母 = E、A、U、A，共 4 個<br>P = 4 ÷ 10 = 2/5"},
+
+// —— 補充：F1／F2 其他課題（歷屆試題） ——
+{t:"補充｜F1有向數 24-25",ty:"num",q:"計算 (2024 − (−2024)) ÷ (−2024)。<span class='m'>(輸入數值)</span>",num:-2,tol:0.001,m:5,e:"<span class='fml'>法則：減負數 = 加正數；正數 ÷ 負數 = 負數</span><br>(2024 − (−2024)) ÷ (−2024)<br>= (2024 + 2024) ÷ (−2024)<br>= 4048 ÷ (−2024)<br>= −2"},
+{t:"補充｜F1有向數 22-23",ty:"mc",q:"計算 (5 − (−5)) ÷ (−5)。",o:["−5","−2","4","5"],a:1,m:5,e:"<span class='fml'>法則：減負數 = 加正數；正數 ÷ 負數 = 負數</span><br>(5 − (−5)) ÷ (−5)<br>= (5 + 5) ÷ (−5)<br>= 10 ÷ (−5)<br>= −2"},
+{t:"補充｜F1代入法 22-23",ty:"num",q:"已知科學公式 E = p² ÷ (2m)。若 p = 30 及 E = 50，求 m 的值。",num:9,tol:0.001,m:5,e:"<span class='fml'>公式：E = p² ÷ (2m)</span><br>50 = 30² ÷ (2m)<br>50 = 900 ÷ (2m)<br>2m = 900 ÷ 50 = 18<br>m = 9"},
+{t:"補充｜F1多項式 24-25",ty:"num",q:"寫出多項式 2x³ − x² + 10 中 x² 的係數。",num:-1,tol:0.001,m:4,e:"<span class='fml'>定義：係數 = 某項前面（連符號）的數字</span><br>x² 的項是「−x²」<br>∴ x² 的係數 = −1"},
+{t:"補充｜F1多項式 23-24",ty:"num",q:"寫出多項式 5 − 2x⁴ + x³ 的次數。",num:4,tol:0.001,m:4,e:"<span class='fml'>定義：次數 = 各項中最高嘅指數</span><br>各項指數：5 → 0；−2x⁴ → 4；x³ → 3<br>最高指數 = 4<br>∴ 次數 = 4"},
+{t:"補充｜F1多項式 22-23",ty:"num",q:"寫出多項式 2x³ + 3x² − 4 的常數項。",num:-4,tol:0.001,m:4,e:"<span class='fml'>定義：常數項 = 不含變數的項</span><br>多項式 2x³ + 3x² − 4 中，不含 x 的項是「−4」<br>∴ 常數項 = −4"},
+{t:"補充｜F1多項式 24-25",ty:"mc",q:"展開 (x − 1)(x + 5)。",o:["x² + 4x − 5","x² + 4x + 5","x² + 6x − 5","x² − 6x − 5"],a:0,m:5,e:"<span class='fml'>公式：(x + a)(x + b) = x² + (a + b)x + ab</span><br>(x − 1)(x + 5)<br>= x² + (−1 + 5)x + (−1)(5)<br>= x² + 4x − 5"},
+{t:"補充｜F1多項式 23-24",ty:"mc",q:"化簡 (−2b² + 1) − (−5b² − b) + 8b。",o:["3b² + 9b + 1","−7b² + 9b + 1","3b² + 7b + 1","3b² + 9b − 1"],a:0,m:5,e:"<span class='fml'>法則：去括號（負號要變號）→ 合併同類項</span><br>(−2b² + 1) − (−5b² − b) + 8b<br>= −2b² + 1 + 5b² + b + 8b<br>= (−2 + 5)b² + (1 + 8)b + 1<br>= 3b² + 9b + 1"},
+{t:"補充｜F1多項式 24-25",ty:"mc",q:"以 x 的降冪排列多項式 x² − 3x + 8 + x³。",o:["x³ + x² − 3x + 8","8 − 3x + x² + x³","x² + x³ − 3x + 8","x³ − 3x + x² + 8"],a:0,m:5,e:"<span class='fml'>方法：降冪 = 由高次到低次排列</span><br>各項次數：x²→2、−3x→1、8→0、x³→3<br>按次數 3 → 2 → 1 → 0：x³ + x² − 3x + 8"},
+{t:"補充｜F1多項式 23-24",ty:"mc",q:"以 k 的升冪排列多項式 4k − 9 + 5k³ − 2k²。",o:["−9 + 4k − 2k² + 5k³","5k³ − 2k² + 4k − 9","4k − 9 + 5k³ − 2k²","−9 + 5k³ − 2k² + 4k"],a:0,m:5,e:"<span class='fml'>方法：升冪 = 由低次到高次排列</span><br>各項次數：4k→1、−9→0、5k³→3、−2k²→2<br>按次數 0 → 1 → 2 → 3：−9 + 4k − 2k² + 5k³"},
+{t:"補充｜F1數列 22-23",ty:"num",q:"某數列的第 n 項是 1 ÷ (4n)。求該數列第 5 項的值。<span class='m'>(以分數作答，如 1/20)</span>",num:1/20,tol:0.006,m:5,e:"<span class='fml'>方法：把 n = 5 代入第 n 項</span><br>第 5 項 = 1 ÷ (4 × 5)<br>= 1 ÷ 20<br>= 1/20"},
+{t:"補充｜F1解方程 22-23",ty:"num",q:"解方程 (8 − x) ÷ 3 = x。",num:2,tol:0.001,m:5,e:"<span class='fml'>方法：兩邊乘 3 去分母 → 移項</span><br>(8 − x) ÷ 3 = x<br>8 − x = 3x<br>8 = 4x<br>x = 2"},
+{t:"補充｜F1方程文字題 23-24",ty:"mc",q:"小德及小華共有 72 個球，小德擁有 k 個球。以 k 表示小華擁有球的數目。",o:["72 − k","k − 72","72 + k","72k"],a:0,m:5,e:"<span class='fml'>思路：總數 − 小德的 = 小華的</span><br>小華擁有球的數目 = 72 − k"},
+{t:"補充｜F1方程文字題 23-24",ty:"mc",q:"「n 與 10 之和的 3 倍等於 42。」建立一個可求得 n 的方程。",o:["3(n + 10) = 42","3n + 10 = 42","n + 30 = 42","3n − 10 = 42"],a:0,m:5,e:"<span class='fml'>翻譯：n 與 10 之和 = (n + 10)；3 倍 = 3 × (n + 10)</span><br>∴ 方程 = 3(n + 10) = 42"},
+{t:"補充｜F1方程文字題 22-23",ty:"mc",q:"柏軒今年 k 歲。三年前，爸爸的年歲是他的 5 倍。寫出爸爸三年前的年齡。",o:["5(k − 3)","5k − 3","5k + 3","(k − 3) + 5"],a:0,m:5,e:"<span class='fml'>翻譯：柏軒三年前 = (k − 3)；5 倍 = 5 × (k − 3)</span><br>∴ 爸爸三年前的年齡 = 5(k − 3)（即 5k − 15）"},
+{t:"補充｜F1方程文字題 24-25",ty:"mc",q:"現有 6 箱塗改帶，每箱有 x 支。若多買 3 支，剛好可平分成 7 份。寫出每份塗改帶的數量。",o:["(6x + 3) ÷ 7","6x ÷ 7 + 3","(6x − 3) ÷ 7","6(x + 3) ÷ 7"],a:0,m:5,e:"<span class='fml'>思路：總數 = 6 箱 × x + 3；平分成 7 份 = 總數 ÷ 7</span><br>每份塗改帶的數量 = (6x + 3) ÷ 7"},
+{t:"補充｜F1座標 24-25",ty:"mc",q:"點 S(−4, 2) 沿 x 軸反射至 S′，求 S′ 的坐標。",o:["(−4, −2)","(4, 2)","(−4, 2)","(4, −2)"],a:0,m:4,e:"<span class='fml'>法則：沿 x 軸反射 → x 坐標不變、y 坐標變號</span><br>S(−4, 2) → S′(−4, −2)"},
+{t:"補充｜F1座標 22-23",ty:"mc",q:"點 S(−4, 2) 沿 y 軸反射至 S′，求 S′ 的坐標。",o:["(−4, −2)","(4, 2)","(−4, 2)","(4, −2)"],a:1,m:4,e:"<span class='fml'>法則：沿 y 軸反射 → y 坐標不變、x 坐標變號</span><br>S(−4, 2) → S′(4, 2)"},
+{t:"補充｜F1比例 23-24",ty:"mc",q:"設 a 及 b 均為非零的數。若 2b = 10a − 3b，求 a : b。",o:["1 : 2","2 : 1","1 : 5","5 : 1"],a:0,m:5,e:"<span class='fml'>方法：移項合併 → 求 a 與 b 之比</span><br>2b = 10a − 3b<br>2b + 3b = 10a<br>5b = 10a<br>b = 2a<br>∴ a : b = 1 : 2"},
+{t:"補充｜F1比例 22-23",ty:"num",q:"收集舊書活動中，科普書數量和小說數量之比是 14 : 9。若科普書有 56 本，求小說的本數。",num:36,tol:0.001,m:5,e:"<span class='fml'>方法：按比例列方程</span><br>56 : 小說 = 14 : 9<br>56 ÷ 小說 = 14 ÷ 9<br>14 × 小說 = 56 × 9 = 504<br>小說 = 36<br>∴ 小說有 36 本"},
+{t:"補充｜F2恆等式",ty:"mc",q:"恆等式：a² + 2ab + b² = ?",o:["(a + b)²","(a − b)²","(a + b)(a − b)","a² + b²"],a:0,m:4,e:"<span class='fml'>恆等式：a² + 2ab + b² = (a + b)²</span>"},
+{t:"補充｜F2恆等式",ty:"mc",q:"恆等式：a² − 2ab + b² = ?",o:["(a + b)²","(a − b)²","(a + b)(a − b)","a² − b²"],a:1,m:4,e:"<span class='fml'>恆等式：a² − 2ab + b² = (a − b)²</span>"},
+{t:"補充｜F2恆等式",ty:"mc",q:"恆等式：a² − b² = ?",o:["(a + b)²","(a − b)²","(a + b)(a − b)","(a − b)(a − b)"],a:2,m:4,e:"<span class='fml'>恆等式：a² − b² = (a + b)(a − b)</span>"},
+{t:"補充｜F2代數分式 24-25",ty:"mc",q:"化簡 1 ÷ (2x) + 2 ÷ x。",o:["5 ÷ (2x)","3 ÷ (2x)","3 ÷ x","5 ÷ x"],a:0,m:5,e:"<span class='fml'>方法：通分母 → 相加</span><br>1 ÷ (2x) + 2 ÷ x<br>= 1 ÷ (2x) + 4 ÷ (2x)<br>= 5 ÷ (2x)"}
+];
+
+/* ==================== Pokémon 卡 ==================== */
+const TYPES = {"普通":"#A8A878","火":"#F08030","水":"#6890F0","草":"#78C850","雷":"#F8D030","超能力":"#F85888","幽靈":"#705898","蟲":"#A8B820","岩石":"#B8A038","妖精":"#EE99AC","龍":"#7038F8","飛行":"#A890F0","毒":"#A040A0","地面":"#E0C068"};
+const EMO = {"普通":"⭐","火":"🔥","水":"💧","草":"🌿","雷":"⚡","超能力":"🔮","幽靈":"👻","蟲":"🐛","岩石":"🪨","妖精":"✨","龍":"🐉","飛行":"🕊️","毒":"☠️","地面":"🏜️"};
+const RARITY = {common:{l:"普通",c:"#b9b9b9",w:40},uncommon:{l:"不常見",c:"#6fd08c",w:30},rare:{l:"罕見",c:"#59a5ff",w:20},legendary:{l:"傳說",c:"#ffd24a",w:10}};
+const POKEMON = [
+ {n:"鯉魚王",en:"Magikarp",t:["水"],r:"common",hp:30,atk:10},
+ {n:"波波",en:"Pidgey",t:["普通","飛行"],r:"common",hp:40,atk:45},
+ {n:"綠毛蟲",en:"Caterpie",t:["蟲"],r:"common",hp:45,atk:30},
+ {n:"皮皮",en:"Clefairy",t:["妖精"],r:"common",hp:70,atk:45},
+ {n:"小拳石",en:"Geodude",t:["岩石","地面"],r:"common",hp:40,atk:80},
+ {n:"小火龍",en:"Charmander",t:["火"],r:"uncommon",hp:39,atk:52},
+ {n:"車厘龜",en:"Squirtle",t:["水"],r:"uncommon",hp:44,atk:48},
+ {n:"奇異種子",en:"Bulbasaur",t:["草","毒"],r:"uncommon",hp:45,atk:49},
+ {n:"傻鴨",en:"Psyduck",t:["水"],r:"uncommon",hp:50,atk:52},
+ {n:"雷超",en:"Raichu",t:["雷"],r:"uncommon",hp:60,atk:90},
+ {n:"比卡超",en:"Pikachu",t:["雷"],r:"rare",hp:35,atk:55},
+ {n:"耿鬼",en:"Gengar",t:["幽靈","毒"],r:"rare",hp:60,atk:65},
+ {n:"卡比獸",en:"Snorlax",t:["普通"],r:"rare",hp:160,atk:110},
+ {n:"水箭龜",en:"Blastoise",t:["水"],r:"rare",hp:79,atk:83},
+ {n:"噴火龍",en:"Charizard",t:["火","飛行"],r:"legendary",hp:78,atk:84},
+ {n:"超夢夢",en:"Mewtwo",t:["超能力"],r:"legendary",hp:106,atk:110},
+ {n:"夢夢",en:"Mew",t:["超能力"],r:"legendary",hp:100,atk:100},
+ {n:"快龍",en:"Dragonite",t:["龍","飛行"],r:"legendary",hp:91,atk:134}
+];
+const BALL_SVG = '<svg viewBox="0 0 100 100" width="100%" height="100%"><circle cx="50" cy="50" r="46" fill="#ee1515" stroke="#1f1f1f" stroke-width="6"/><path d="M4 50 A46 46 0 0 0 96 50 Z" fill="#fff"/><rect x="4" y="45" width="92" height="10" fill="#1f1f1f"/><circle cx="50" cy="50" r="14" fill="#fff" stroke="#1f1f1f" stroke-width="6"/><circle cx="50" cy="50" r="7" fill="#1f1f1f"/></svg>';
+
+/* ==================== 引擎 ==================== */
+const $ = id => document.getElementById(id);
+let total = Q.reduce((s,q)=>s+q.m,0);
+let idx = 0, score = 0, answered = false;
+$('totalQ').textContent = Q.length;
+
+function showScreen(n){ document.querySelectorAll('.screen').forEach(s=>s.classList.add('hidden')); $('screen-'+n).classList.remove('hidden'); window.scrollTo({top:0}); }
+function startQuiz(){ idx=0; score=0; showScreen('quiz'); render(); }
+
+function render(){
+  answered = false;
+  const q = Q[idx];
+  $('topic').textContent = q.t;
+  $('qcount').textContent = (idx+1)+' / '+Q.length;
+  $('score').textContent = '得分 '+score+' / '+total;
+  $('progbar').style.width = (idx/Q.length*100)+'%';
+  $('qtext').innerHTML = q.q;
+  $('fb').className = 'fb hidden';
+  $('nextBtn').classList.add('hidden');
+  const area = $('answerArea'); area.innerHTML='';
+  if(q.ty==='mc') buildMC(q, area);
+  else if(q.ty==='multi') buildMulti(q, area);
+  else buildNum(q, area);
+}
+
+function buildMC(q, area){
+  const w = document.createElement('div'); w.className='opts';
+  q.o.forEach((opt,i)=>{
+    const b = document.createElement('button'); b.className='opt';
+    b.innerHTML = '<span class="key">'+'ABCD'[i]+'</span><span>'+opt+'</span>';
+    b.onclick = ()=> gradeMC(q, w, i);
+    w.appendChild(b);
+  });
+  area.appendChild(w);
+}
+function buildMulti(q, area){
+  area.innerHTML = '<div class="multi-hint">☑ 請選取「所有」正確答案，再按確認</div>';
+  const w = document.createElement('div'); w.className='opts';
+  const sel = new Set();
+  q.o.forEach((opt,i)=>{
+    const b = document.createElement('button'); b.className='opt';
+    b.innerHTML = '<span class="key">'+'ABCD'[i]+'</span><span>'+opt+'</span>';
+    b.onclick = ()=>{ if(answered) return; sel.has(i)?sel.delete(i):sel.add(i); b.classList.toggle('sel',sel.has(i)); };
+    w.appendChild(b);
+  });
+  const btn = document.createElement('button'); btn.className='submitbtn'; btn.textContent='確認答案';
+  btn.onclick = ()=>{ if(answered) return; const arr=[...sel].sort(); const ans=[...q.a].sort(); gradeMulti(q, w, arr, ans); };
+  area.appendChild(w); area.appendChild(btn);
+}
+function buildNum(q, area){
+  const w = document.createElement('div'); w.className='numwrap';
+  const inp = document.createElement('input'); inp.id='numIn'; inp.type='text'; inp.placeholder='輸入答案…'; inp.inputMode='text'; inp.autocomplete='off';
+  const btn = document.createElement('button'); btn.className='submitbtn'; btn.textContent='提交';
+  const go = ()=>{ if(answered) return; const v = inp.value; if(!v.trim()) return; const ok = checkNum(v, q); grade(q, ok, w, inp); };
+  btn.onclick = go;
+  inp.addEventListener('keydown', e=>{ if(e.key==='Enter') go(); });
+  w.appendChild(inp); w.appendChild(btn);
+  area.appendChild(w);
+}
+
+function gradeMC(q, wrap, i){
+  if(answered) return; answered = true;
+  const ok = (i===q.a);
+  const opts = wrap.querySelectorAll('.opt');
+  opts.forEach((b,j)=>{ b.classList.add('disabled'); if(j===q.a) b.classList.add('correct'); if(j===i && !ok) b.classList.add('wrong'); });
+  grade(q, ok, wrap, opts[i]);
+}
+function gradeMulti(q, wrap, arr, ans){
+  if(answered) return; answered = true;
+  const ok = JSON.stringify(arr)===JSON.stringify(ans);
+  wrap.querySelectorAll('.opt').forEach((b,j)=>{ b.classList.add('disabled'); if(q.a.includes(j)) b.classList.add('correct'); else if(arr.includes(j)) b.classList.add('wrong'); });
+  grade(q, ok, wrap, null);
+}
+function grade(q, ok, area, focusEl){
+  answered = true; // 同一題只計第一次作答的分數
+  if(ok) score += q.m;
+  $('score').textContent = '得分 '+score+' / '+total;
+  $('answerArea').querySelectorAll('button, input').forEach(el=>{ el.disabled = true; });
+  const fb = $('fb');
+  fb.className = 'fb '+(ok?'good':'bad');
+  fb.innerHTML = '<div class="ttl">'+(ok?'✅ 答對了！ +'+q.m+' 分':'❌ 答錯了')+'</div><div class="exp"><b>題解：</b>'+q.e+'</div>';
+  $('nextBtn').classList.remove('hidden');
+  $('nextBtn').textContent = (idx===Q.length-1) ? '查看成績 🏁' : '下一題 →';
+}
+function next(){
+  idx++;
+  if(idx>=Q.length) finish();
+  else render();
+}
+
+/* 數字答案核對 */
+function norm(s){
+  s = String(s);
+  const fw='０１２３４５６７８９（）．＋－％／×÷，', hw='0123456789().+-%/*x,';
+  for(let i=0;i<fw.length;i++) s = s.split(fw[i]).join(hw[i]);
+  return s.toLowerCase().replace(/\s+/g,'').replace(/\$/g,'').replace(/%/g,'')
+    .replace(/×/g,'*').replace(/÷/g,'/').replace(/元|蚊|港幣|港元|km2|km²|cm2|cm²|cm|km|m²|m/g,'').replace(/,/g,'');
+}
+function checkNum(raw, q){
+  let s = norm(raw);
+  if(s==='') return false;
+  let val = null;
+  const fr = s.match(/^\(?(-?\d+(?:\.\d+)?)\/(\d+(?:\.\d+)?)\)?$/);
+  if(fr && parseFloat(fr[2])!==0){ val = parseFloat(fr[1])/parseFloat(fr[2]); }
+  else { const n = parseFloat(s); if(!isNaN(n)) val = n; }
+  if(val==null) return false;
+  return Math.abs(val - q.num) <= q.tol;
+}
+
+/* ==================== 結果 & 抽卡 ==================== */
+function finish(){
+  const pct = Math.round(score/total*100);
+  const pass = pct >= 50;
+  $('pct').textContent = pct+'%';
+  $('resline').textContent = '得分 '+score+' / '+total+'（合格線：'+Math.ceil(total*0.5)+' 分 = 50%）';
+  const stars = pass ? Math.min(5, Math.max(1, Math.ceil(pct/20))) : (score>0?1:0);
+  $('stars').textContent = '★'.repeat(stars)+'☆'.repeat(5-stars);
+  const v = $('verdict');
+  v.className = 'verdict '+(pass?'pass':'fail');
+  v.innerHTML = pass ? '🎉 合格！你獲得 1 次抽 Pokémon 卡機會！' : '😅 未達 50%，溫習一下再挑戰吧！';
+  const da = $('drawArea');
+  if(pass){
+    da.innerHTML = '<p style="color:#5b4aa8;font-weight:800;font-size:15px">👇 抽卡時間！</p>'
+      +'<div class="pokestage"><div class="pokecard" id="pokecard"><div class="face cardback"><span class="ball" style="width:120px;height:120px">'+BALL_SVG+'</span><p>精靈球</p></div><div class="face cardface" id="cardface"></div></div></div>'
+      +'<button class="bigbtn drawbtn" id="drawBtn" onclick="drawCard()">🎁 抽卡！</button>';
+  } else {
+    da.innerHTML = '';
+  }
+  renderCollection();
+  showScreen('result');
+  if(pass) confetti();
+}
+
+function pickCard(){
+  const pool=[]; POKEMON.forEach((p,i)=>{ const w=RARITY[p.r].w; for(let k=0;k<w;k++) pool.push(i); });
+  return pool[Math.floor(Math.random()*pool.length)];
+}
+function drawCard(){
+  const btn = $('drawBtn'); btn.disabled = true; btn.textContent = '抽卡中…';
+  const idxC = pickCard();
+  const p = POKEMON[idxC];
+  const main = TYPES[p.t[0]];
+  const face = $('cardface');
+  face.style.background = 'linear-gradient(160deg,'+main+', #22223a 130%)';
+  face.style.border = '4px solid '+RARITY[p.r].c;
+  face.innerHTML = '<div class="shine"></div>'
+    +'<div class="ptoprow"><div><div class="pname">'+p.n+'</div><div class="pen">'+p.en+'</div></div><div class="php">HP '+p.hp+'</div></div>'
+    +'<div class="ptypes">'+p.t.map(t=>'<span class="ptype">'+t+'</span>').join('')+'</div>'
+    +'<div class="pportrait"><span class="big">'+EMO[p.t[0]]+'</span><span class="ballw">'+BALL_SVG+'</span></div>'
+    +'<div class="pstats"><div class="pstat">攻擊力<span>'+p.atk+'</span></div><div class="pstat">稀有度<span style="color:'+RARITY[p.r].c+'">'+RARITY[p.r].l+'</span></div></div>'
+    +'<div class="prarity" style="color:'+RARITY[p.r].c+'">'+('★'.repeat({common:1,uncommon:2,rare:3,legendary:5}[p.r]))+'</div>';
+  setTimeout(()=>{ $('pokecard').classList.add('flip'); }, 250);
+  setTimeout(()=>{ btn.textContent = '再抽一次！'; btn.disabled = false; }, 1200);
+  // save collection
+  const col = loadCol(); col[idxC]=(col[idxC]||0)+1; saveCol(col);
+  renderCollection();
+}
+function loadCol(){ try{ return JSON.parse(localStorage.getItem('pk_col')||'{}'); }catch(e){ return {}; } }
+function saveCol(c){ localStorage.setItem('pk_col', JSON.stringify(c)); }
+function renderCollection(){
+  const col = loadCol();
+  const totalOwn = Object.values(col).reduce((a,b)=>a+b,0);
+  let html = '<h3>📖 我的圖鑑 <span style="color:#b9b9b9;font-weight:600;font-size:12px">（已收集 '+totalOwn+' 張）</span></h3><div class="colgrid">';
+  POKEMON.forEach((p,i)=>{
+    const c = col[i]||0;
+    const main = TYPES[p.t[0]];
+    if(c>0){
+      html += '<div class="mini" style="background:linear-gradient(160deg,'+main+',#22223a 140%)"><div class="mn">'+p.n+'</div><div class="mr">'+p.t[0]+'</div><div class="mc">×'+c+'</div></div>';
+    } else {
+      html += '<div class="mini locked" style="background:#e6e1f5"><div class="lock">❓</div><div class="mn" style="color:#9a93b8">???</div></div>';
+    }
+  });
+  html += '</div>';
+  $('collwrap').innerHTML = html;
+}
+
+/* confetti */
+function confetti(){
+  const colors=['#ff6ec4','#7b2ff7','#00c6ff','#ffe45e','#19c37d','#ff4d6d'];
+  for(let i=0;i<90;i++){
+    const c=document.createElement('div'); c.className='conf';
+    c.style.left=Math.random()*100+'vw';
+    c.style.background=colors[i%colors.length];
+    c.style.animationDuration=(2.2+Math.random()*2)+'s';
+    c.style.animationDelay=(Math.random()*1.2)+'s';
+    document.body.appendChild(c);
+    setTimeout(()=>c.remove(), 5000);
+  }
+}
+</script>
+</body>
+</html>
